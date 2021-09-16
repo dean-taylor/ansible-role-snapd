@@ -27,7 +27,7 @@
     - name: kernel.unprivileged_userns_clone=1
       ansible.builtin.command:
         cmd: sysctl -q -w kernel.unprivileged_userns_clone=1
-      when: sysctl_query.stdout is regex("= 0$")
+      when: sysctl_query.stdout is regex("=\s*0$")
   when:
     - ansible_distribution in "Debian"
     - ansible_distribution_version in "10"
