@@ -1,0 +1,9 @@
+---
+# tasks file for snapd install Debian (ansible_os_family)
+
+- name: install
+  ansible.builtin.apt:
+    cache_valid_time: 86400
+    name: snapd
+    state: present
+

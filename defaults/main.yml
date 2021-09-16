@@ -1,0 +1,4 @@
+---
+# defaults file for snapd
+#
+snapd_service: snapd.socket

@@ -1,0 +1,33 @@
+---
+# tasks file for snapd install RedHat (ansible_os_family)
+
+- name: epel
+  ansible.builtin.package:
+    name: epel-release
+  when: ansible_distribution in "CentOS"
+- block:
+    - name: epel rhel8
+      ansible.builtin.dnf:
+        name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+        state: present
+        update_cache: yes
+      when: ansible_distribution_version in "8"
+
+    - name: epel rhel7
+      ansible.builtin.yum:
+        name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+        state: present
+        update_cache: yes
+      when: ansible_distribution_version in "7"
+  when: ansible_distribution in "RedHat"
+
+- name: install
+  ansible.builtin.package:
+    name: snapd
+    state: present
+
+- name: enable classic snap support
+  ansible.builtin.file:
+    path: /varlib/snapd/snap
+    dest: /snap
+    type: symlink

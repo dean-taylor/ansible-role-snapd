@@ -1,0 +1,33 @@
+---
+# tasks file for snapd configure
+
+- name: enable service
+  ansible.builtin.service:
+    enabled: yes
+    name: "{{ snapd_service }}"
+    state: started
+
+- name: snap installed?
+  ansible.builtin.shell:
+    cmd: snap list
+  changed_when: false
+  register: snap_list
+
+- name: install core
+  ansible.builtin.command:
+    cmd: snap install core
+  when: snap_list.stdout is not regex("core[0-9]{2}")
+
+- block:
+    - name: kernel.unprivileged_userns_clone=1?
+      ansible.builtin.shell:
+        cmd: sysctl -a |grep kernel.unprivileged_userns_clone
+      changed_when: false
+      register: sysctl_query
+    - name: kernel.unprivileged_userns_clone=1
+      ansible.builtin.command:
+        cmd: sysctl -q -w kernel.unprivileged_userns_clone=1
+      when: sysctl_query.stdout is regex("= 0$")
+  when:
+    - ansible_distribution in "Debian"
+    - ansible_distribution_version in "10"
